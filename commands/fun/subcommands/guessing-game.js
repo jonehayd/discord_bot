@@ -1,14 +1,16 @@
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName('guessing-game')
-        .setDescription(`Guess a number 1-5.`)
-        .addStringOption(option =>
-            option.setName('guess')
-                .setDescription('Your guess (1-5)')
-                .setRequired(true)
-        ),
+    name: 'guessing-game',
+    data: subcommand =>
+        subcommand
+            .setName('guessing-game')
+            .setDescription(`Guess a number 1-5.`)
+            .addStringOption(option =>
+                option.setName('guess')
+                    .setDescription('Your guess (1-5)')
+                    .setRequired(true)
+            ),
     async execute(interaction) {
         const guess = parseInt(interaction.options.getString('guess'), 10);
 

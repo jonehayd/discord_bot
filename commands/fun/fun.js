@@ -1,18 +1,18 @@
 /**
- * @file economy.js
- * @description Slash command for all economy commands
- * @module /commands/economy/
+ * @file fun.js
+ * @description Slash command for all 'fun' commands
+ * @module commands/fun/
  */
 
 const { SlashCommandBuilder } = require('discord.js');
 
-const name = 'economy';
+const name = 'fun';
 
 module.exports = {
     name,
     data: new SlashCommandBuilder()
         .setName(name)
-        .setDescription('Currency management commands'),
+        .setDescription('Play games'),
     loadSubcommands: true,
     cooldown: 5,
     async execute(interaction) {
