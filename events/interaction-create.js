@@ -1,3 +1,9 @@
+/**
+ * @file interactionCreate.js
+ * @description Executes the correct command when a user entered a slash command in a guild
+ * @module events/
+ */
+
 const { Events, MessageFlags, Collection } = require('discord.js');
 
 module.exports = {

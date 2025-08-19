@@ -29,7 +29,7 @@
   "_moduleAliases": {
   "@root": ".",
   "@commands": "commands",
-  "@utility": "utility",
+  "@utils": "utils",
   "@events": "events"
 }
 }
