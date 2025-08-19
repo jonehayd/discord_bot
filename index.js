@@ -1,3 +1,4 @@
+require('module-alias/register');
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
@@ -14,8 +15,6 @@ const client = new Client({
 	],
  });
 
-const prefix = "coco!";
-
 // Load commands
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
@@ -30,10 +29,11 @@ for (const folder of commandFolders) {
 		if ('data' in command && 'execute' in command) {
 			client.commands.set(command.data.name, command);
 		} else {
-			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+			console.log(`[WARNING] The command at ${filePath} is missing a required "data", or "execute" property.`);
 		}
 	}
 }
+console.log(`Loaded commands: ${client.commands.size}`);
 
 // Collection for command cooldowns
 client.cooldowns = new Collection();
@@ -46,9 +46,9 @@ for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
 	const event = require(filePath);
 	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args, client, prefix));
+		client.once(event.name, (...args) => event.execute(...args));
 	} else {
-		client.on(event.name, (...args) => event.execute(...args, client, prefix));
+		client.on(event.name, (...args) => event.execute(...args));
 	}
 }
 
