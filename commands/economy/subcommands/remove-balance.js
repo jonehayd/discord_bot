@@ -4,7 +4,7 @@
  * @module commands/economy/subcommands/
  */
 
-const { removeBalance } = require('@root/currency.js');
+const { removeBalance } = require('@database/currency.js');
 
 module.exports = {
     name: 'removebalance',

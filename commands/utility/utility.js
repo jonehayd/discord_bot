@@ -4,7 +4,7 @@
  * @module commands/utility/
  */
 
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 
 const name = 'utility';
 
@@ -22,7 +22,7 @@ module.exports = {
         if (!subcommand) {
             return interaction.reply({ 
                 content: 'Unknown subcommand.', 
-                ephemeral: true 
+                flags: MessageFlags.Ephemeral 
             });
         }
 
@@ -33,7 +33,7 @@ module.exports = {
 
             const errorMessage = {
                 content: `There was an error executing that ${this.name} command. Please try again later.`,
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             };
 
             if (interaction.replied || interaction.deferred) {

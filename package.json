@@ -30,6 +30,7 @@
   "@root": ".",
   "@commands": "commands",
   "@utils": "utils",
-  "@events": "events"
+  "@events": "events",
+  "@database": "database"
 }
 }

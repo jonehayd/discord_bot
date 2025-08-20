@@ -4,7 +4,7 @@
  * @module commands/economy/subcommands/
  */
 
-const { getBalance } = require('@root/currency.js');
+const { getBalance } = require('@database/currency.js');
 
 module.exports = {
     name: 'balance',
@@ -22,5 +22,5 @@ module.exports = {
         const balance = await getBalance(targetUser.id);
 
         await interaction.reply(`${targetUser.username}'s balance is: ${balance} 🥥.`);
-    }
+    },
 };
