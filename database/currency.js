@@ -16,6 +16,10 @@ function getBalance(userId) {
 }
 
 function addBalance(userId, amount) {
+  if(!userId || !amount) {
+    throw new Error('[Error] userId and amount cannot be null in addBalance');
+  }
+  
   const row = db.prepare("SELECT balance FROM users WHERE id = ?").get(userId);
   const currentBalance = row ? row.balance : 0;
 

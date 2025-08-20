@@ -1,9 +1,3 @@
-/**
- * @file interactionCreate.js
- * @description Executes the correct command when a user entered a slash command in a guild
- * @module events/
- */
-
 const { Events, MessageFlags, Collection } = require('discord.js');
 
 module.exports = {
@@ -34,18 +28,15 @@ module.exports = {
 
             if (now < expirationTime) {
                 const expiredTimestamp = Math.round(expirationTime / 1_000);
-                return interaction.reply({ content: `Please wait, you are on a cooldown for /~${command.data.name}/~. You can use it again <t:${expiredTimestamp}:R>.`, flags: MessageFlags.Ephemeral });
+                return interaction.reply({ 
+                    content: `Please wait, you are on a cooldown for /${command.data.name}. You can use it again <t:${expiredTimestamp}:R>.`, 
+                    flags: MessageFlags.Ephemeral 
+                });
             }
         }
 
         timestamps.set(interaction.user.id, now);
         setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
-
-        try {
-
-        } catch (error) {
-
-        }
 
         try {
             await command.execute(interaction);

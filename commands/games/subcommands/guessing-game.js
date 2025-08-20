@@ -1,11 +1,14 @@
 const { SlashCommandBuilder } = require('discord.js');
+const { addBalance } = require('@database/currency.js');
+
+const winAmount = 100;
 
 module.exports = {
     name: 'guessing-game',
     data: subcommand =>
         subcommand
             .setName('guessing-game')
-            .setDescription(`Guess a number 1-5.`)
+            .setDescription(`Guess a number 1-5. Win ${winAmount} 🥥!`)
             .addStringOption(option =>
                 option.setName('guess')
                     .setDescription('Your guess (1-5)')
@@ -20,7 +23,8 @@ module.exports = {
 
         const randomNumber = Math.floor(Math.random() * 5) + 1;
         if (guess == randomNumber) {
-            return interaction.reply(`Nice! You guessed the correct number: ${randomNumber}.`);
+            await addBalance(interaction.user.id, winAmount);
+            return interaction.reply(`Nice! You guessed the correct number: ${randomNumber}\nYou win ${winAmount} 🥥 `);
         } else {
             return interaction.reply(`Incorrect! The correct number was ${randomNumber}.`);
         }

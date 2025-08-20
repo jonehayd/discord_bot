@@ -1,12 +1,12 @@
 /**
- * @file fun.js
- * @description Slash command for all 'fun' commands
+ * @file games.js
+ * @description Slash command for all 'games' commands
  * @module commands/fun/
  */
 
 const { SlashCommandBuilder, MessageFlags } = require('discord.js');
 
-const name = 'fun';
+const name = 'games';
 
 module.exports = {
     name,
