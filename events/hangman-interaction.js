@@ -15,9 +15,6 @@ const hangmanManager = require('@commands/games/subcommands/hangman.js');
 module.exports = {
     name: Events.InteractionCreate,
     async execute(interaction) {
-        // -------------------
-        // Handle Button Clicks
-        // -------------------
         if (interaction.isButton() && interaction.customId.startsWith('hangman_')) {
             const [ , type, guildId, ownerId] = interaction.customId.split('_'); // skip "hangman"
             const gameId = `${guildId}_${ownerId}`;
@@ -69,9 +66,6 @@ module.exports = {
             }
         }
 
-        // -------------------
-        // Handle Modal Submit
-        // -------------------
         if (interaction.isModalSubmit() && interaction.customId.startsWith('hangman_modal_')) {
             const gameId = interaction.customId.split('_').slice(2).join('_');
             const game = hangmanManager.getGame(gameId);
@@ -121,7 +115,6 @@ module.exports = {
                 )
             ];
 
-            // ✅ Modal submits must use reply (not update)
             return interaction.reply({ embeds: [embed], components });
         }
     },

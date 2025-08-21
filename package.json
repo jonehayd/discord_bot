@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/hayden0987/discord_bot#readme",
   "dependencies": {
+    "axios": "^1.11.0",
     "better-sqlite3": "^12.2.0",
     "discord.js": "^14.21.0",
     "dotenv": "^17.2.1",
@@ -27,10 +28,10 @@
     "eslint": "^9.32.0"
   },
   "_moduleAliases": {
-  "@root": ".",
-  "@commands": "commands",
-  "@utils": "utils",
-  "@events": "events",
-  "@database": "database"
-}
+    "@root": ".",
+    "@commands": "commands",
+    "@utils": "utils",
+    "@events": "events",
+    "@database": "database"
+  }
 }

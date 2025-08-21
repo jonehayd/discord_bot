@@ -7,6 +7,7 @@ const { loadSubcommands } = require('@utils/command-loader.js');
 // Retrieve token
 require('dotenv').config();
 const token = process.env.DISCORD_TOKEN;
+const steamKey = process.env.STEAM_KEY;
 
 const client = new Client({ 
     intents: [
