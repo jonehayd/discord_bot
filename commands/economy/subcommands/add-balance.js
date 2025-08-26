@@ -21,6 +21,7 @@ module.exports = {
                 option.setName('amount')
                     .setDescription('The amount to add')
                     .setRequired(true)
+                    .setMinValue(1)
             ),
     async execute(interaction) {
         const targetUser = interaction.options.getUser('user');
