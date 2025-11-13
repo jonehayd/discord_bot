@@ -1,15 +1,9 @@
-/**
- * @file balance.js
- * @description States a user's current balance
- * @module commands/economy/subcommands/
- */
-
 const { getBalance } = require('@database/currency.js');
+const { SlashCommandSubcommandBuilder } = require('discord.js');
 
 module.exports = {
     name: 'balance',
-    data: subcommand =>
-        subcommand
+    data: new SlashCommandSubcommandBuilder()
             .setName('balance')
             .setDescription('Check a user\'s balance')
             .addUserOption(option =>

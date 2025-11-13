@@ -10,7 +10,7 @@ const {
     MessageFlags 
 } = require('discord.js');
 
-const hangmanManager = require('@commands/games/subcommands/hangman.js');
+const hangmanManager = require('@commands/games/hangman.js');
 
 module.exports = {
     name: Events.InteractionCreate,

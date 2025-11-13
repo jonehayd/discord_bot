@@ -1,4 +1,4 @@
-const { MessageFlags } = require('discord.js');
+const { MessageFlags, SlashCommandSubcommandBuilder } = require('discord.js');
 const { addBalance } = require('@database/currency.js');
 const axios = require('axios');
 
@@ -6,9 +6,8 @@ const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
 module.exports = {
     name: 'random-steamgame',
-    data: subcommand =>
-        subcommand
-            .setName('random-steam-game')
+    data: new SlashCommandSubcommandBuilder()
+            .setName('random-steamgame')
             .setDescription(`Gives a random game from a user\'s steam library. Your steam library must be set to public.`)
             .addStringOption(option =>
                 option.setName('steam_id')
@@ -23,7 +22,7 @@ module.exports = {
             const library = await getLibrary(steamId64);
 
             if(library.length === 0) {
-            return await interaction.reply('No games found or the library is private.');
+                return await interaction.reply('No games found or the library is private.');
             }
             const gameNames = library.map(game => game.name);
             const randomGame = gameNames[Math.floor(Math.random() * gameNames.length)];

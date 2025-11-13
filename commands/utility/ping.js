@@ -1,9 +1,8 @@
-const { SlashCommandBuilder, MessageFlags } = require('discord.js');
+const { SlashCommandSubcommandBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
 	name: 'ping',
-	data: subcommand =>
-		subcommand
+	data: new SlashCommandSubcommandBuilder()
 			.setName('ping')
 			.setDescription('Replies with Pong!'
 		),

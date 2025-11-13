@@ -1,4 +1,4 @@
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, EmbedBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageFlags, EmbedBuilder, SlashCommandSubcommandBuilder } = require('discord.js');
 
 const winAmount = 300;
 
@@ -232,8 +232,7 @@ function createGameEmbed(game, isGameOver = false, won = false) {
 
 module.exports = {
     name: 'hangman',
-    data: subcommand =>
-        subcommand
+    data: new SlashCommandSubcommandBuilder()
             .setName('hangman')
             .setDescription(`Play a game of Hangman! Win ${winAmount} 🥥`),
     async execute(interaction) {

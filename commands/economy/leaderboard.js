@@ -1,15 +1,9 @@
-/**
- * @file balance.js
- * @description States a user's current balance
- * @module commands/economy/subcommands/
- */
-
 const { getLeaderboard } = require('@database/currency.js');
+const { SlashCommandSubcommandBuilder } = require('discord.js');
 
 module.exports = {
     name: 'leaderboard',
-    data: subcommand =>
-        subcommand
+    data: new SlashCommandSubcommandBuilder()
             .setName('leaderboard')
             .setDescription('Displays the top 5 user\'s with the most 🥥'),
     async execute(interaction) {

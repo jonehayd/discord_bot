@@ -1,5 +1,5 @@
 const { Events, MessageFlags } = require('discord.js');
-const blackjackManager = require('@commands/games/subcommands/blackjack.js');
+const blackjackManager = require('@commands/games/blackjack.js');
 const { addBalance, removeBalance } = require('@database/currency.js');
 
 module.exports = {

@@ -1,15 +1,9 @@
-/**
- * @file transfer-balance.js
- * @description Transfers money from one user to another
- * @module commands/economy/subcommands/
- */
-
 const { transferBalance } = require('@database/currency.js');
+const { SlashCommandSubcommandBuilder } = require('discord.js');
 
 module.exports = {
     name: 'transfer-balance',
-     data: subcommand =>
-        subcommand
+     data: new SlashCommandSubcommandBuilder()
             .setName('transferbalance')
             .setDescription('Transfer money from one person to another')
             .addUserOption(option =>

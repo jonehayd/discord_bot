@@ -1,15 +1,9 @@
-/**
- * @file remove-balance.js
- * @description Removes from a user's balance
- * @module commands/economy/subcommands/
- */
-
 const { removeBalance } = require('@database/currency.js');
+const { SlashCommandSubcommandBuilder } = require('discord.js');
 
 module.exports = {
     name: 'remove-balance',
-    data: subcommand =>
-        subcommand
+    data: new SlashCommandSubcommandBuilder()
             .setName('removebalance')
             .setDescription('Remove from someone\'s balance')
             .addUserOption(option =>

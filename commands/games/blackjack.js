@@ -1,12 +1,10 @@
-// blackjack.js
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandSubcommandBuilder } = require('discord.js');
 
 const games = new Map();
 
 module.exports = {
     name: 'blackjack',
-    data: subcommand =>
-        subcommand
+    data: new SlashCommandSubcommandBuilder()
             .setName('blackjack')
             .setDescription('Play a game of Blackjack!')
             .addIntegerOption(option =>

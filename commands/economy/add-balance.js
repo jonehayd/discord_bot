@@ -1,15 +1,9 @@
-/**
- * @file add-balance.js
- * @description Adds to a user's balance
- * @module commands/economy/subcommands/
- */
-
 const { addBalance } = require('@database/currency.js');
+const { SlashCommandSubcommandBuilder } = require('discord.js');
 
 module.exports = {
     name: 'add-balance',
-    data: subcommand =>
-        subcommand
+    data: new SlashCommandSubcommandBuilder()
             .setName('addbalance')
             .setDescription('Add to someone\'s balance')
             .addUserOption(option =>

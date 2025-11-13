@@ -1,15 +1,11 @@
 require('module-alias/register');
-const fs = require('node:fs');
-const path = require('node:path');
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
-const { loadSubcommands } = require('@utils/command-loader.js');
-
-// Retrieve token
 require('dotenv').config();
-const token = process.env.DISCORD_TOKEN;
-const steamKey = process.env.STEAM_KEY;
+const fs = require('fs');
+const path = require('path');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { loadSubcommands } = require('@utils/load-subcommands.js');
 
-const client = new Client({ 
+const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
@@ -18,72 +14,58 @@ const client = new Client({
     ],
 });
 
+const token = process.env.DISCORD_TOKEN;
+
 // Load commands
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+const commandsPath = path.join(__dirname, 'commands');
+const commandFolders = fs.readdirSync(commandsPath);
 
 console.log(`Loading commands from ${commandFolders.length} folders...`);
 
 for (const folder of commandFolders) {
-    const commandsPath = path.join(foldersPath, folder);
-    
-    // Skip if not a directory
-    if (!fs.statSync(commandsPath).isDirectory()) continue;
-    
-    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-    
-    console.log(`\nProcessing ${folder} folder...`);
-    
-    for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, file);
-        
-        try {
-            // Clear require cache
-            delete require.cache[require.resolve(filePath)];
-            
-            const command = require(filePath);
-            
-            if ('data' in command && 'execute' in command) {
-                // Load subcommands if this command supports them
-                if (command.loadSubcommands) {
-                    const subcommandsMap = new Map();
-                    const result = loadSubcommands(commandsPath, command.data, subcommandsMap);
-                    
-                    // Store subcommands in the command object for later use
-                    command.subcommands = result.subcommands;
-                    
-                    console.log(`${command.data.name} loaded with ${subcommandsMap.size} subcommands`);
-                } else {
-                    console.log(`${command.data.name} loaded (no subcommands)`);
-                }
-                
-                client.commands.set(command.data.name, command);
-            } else {
-                console.log(`[WARNING] ${filePath} is missing required "data" or "execute" property.`);
-            }
-        } catch (error) {
-            console.error(`[ERROR] Failed to load command ${file}:`, error.message);
+    const folderPath = path.join(commandsPath, folder);
+    if (!fs.statSync(folderPath).isDirectory()) continue;
+
+    const indexFile = path.join(folderPath, 'index.js');
+    if (!fs.existsSync(indexFile)) {
+        console.warn(`[WARN] No index.js found in ${folderPath}`);
+        continue;
+    }
+
+    try {
+        const command = require(indexFile);
+
+        // Load subcommands dynamically
+        const { subcommands } = loadSubcommands(folderPath);
+        command.subcommands = subcommands;
+
+        if (command.data && command.execute) {
+            client.commands.set(command.data.name, command);
+            console.log(`Loaded /${command.data.name} (${subcommands.size} subcommands)`);
+        } else {
+            console.warn(`[WARN] Command in ${folderPath} missing data or execute`);
         }
+    } catch (error) {
+        console.error(`[ERROR] Failed to load command in ${folder}:`, error);
     }
 }
 
 console.log(`\nTotal commands loaded: ${client.commands.size}`);
 
-// Collection for command cooldowns
+// Cooldowns
 client.cooldowns = new Collection();
 
 // Load events
 const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const eventFiles = fs.readdirSync(eventsPath).filter(f => f.endsWith('.js'));
 
 for (const file of eventFiles) {
-    const filePath = path.join(eventsPath, file);
-    const event = require(filePath);
+    const event = require(path.join(eventsPath, file));
     if (event.once) {
-        client.once(event.name, (...args) => event.execute(...args));
+        client.once(event.name, (...args) => event.execute(...args, client));
     } else {
-        client.on(event.name, (...args) => event.execute(...args));
+        client.on(event.name, (...args) => event.execute(...args, client));
     }
 }
 

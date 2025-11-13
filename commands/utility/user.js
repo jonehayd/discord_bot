@@ -1,9 +1,8 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandSubcommandBuilder } = require('discord.js');
 
 module.exports = {
 	name: 'user',
-	data: subcommand =>
-		subcommand
+	data: new SlashCommandSubcommandBuilder()
 			.setName('user')
 			.setDescription('Provides information about the user.'
 		),
