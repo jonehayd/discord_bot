@@ -21,7 +21,7 @@ function loadSubcommands(commandFolderPath, commandBuilder, subcommandsMap) {
             try {
                 const filePath = path.join(subcommandsPath, file);
                 
-                // Clear require cache to avoid stale modules during development
+                // Clear require cache to avoid stale modules
                 delete require.cache[require.resolve(filePath)];
                 
                 const subcommand = require(filePath);

@@ -5,7 +5,7 @@ const axios = require('axios');
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
 
 module.exports = {
-    name: 'random-steam-game',
+    name: 'random-steamgame',
     data: subcommand =>
         subcommand
             .setName('random-steam-game')

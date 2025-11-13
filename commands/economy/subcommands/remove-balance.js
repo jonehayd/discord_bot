@@ -7,7 +7,7 @@
 const { removeBalance } = require('@database/currency.js');
 
 module.exports = {
-    name: 'removebalance',
+    name: 'remove-balance',
     data: subcommand =>
         subcommand
             .setName('removebalance')
