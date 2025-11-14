@@ -19,12 +19,9 @@ module.exports = {
     name,
     data: builder,
     cooldown: 5,
-    subcommands,          // Map of loaded subcommands
+    subcommands,          
     loadSubcommands: true,
 
-    /**
-     * Main executor for /economy
-     */
     async execute(interaction) {
         const subcommandName = interaction.options.getSubcommand();
         const subcommand = this.subcommands.get(subcommandName);

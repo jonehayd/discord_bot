@@ -77,9 +77,9 @@ module.exports = {
                 });
             }
 
-            const guess = interaction.fields.getTextInputValue('letter_input').toUpperCase();
+            const guess = interaction.fields.getTextInputValue('letter_input').toLowerCase();
 
-            if (!/^[A-Z]$/.test(guess)) {
+            if (!/^[a-z]$/.test(guess)) {
                 return interaction.reply({ 
                     content: '❌ Please enter a valid letter (A-Z)!', 
                     flags: MessageFlags.Ephemeral 

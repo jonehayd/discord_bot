@@ -39,16 +39,20 @@ for (const folder of commandFolders) {
 
 (async () => {
     try {
-        // Determine route
         const isProduction = process.env.NODE_ENV === 'production';
         const route = isProduction
-            ? Routes.applicationCommands(clientId)
-            : Routes.applicationGuildCommands(clientId, guildId);
+            ? Routes.applicationCommands(clientId)           // Global
+            : Routes.applicationGuildCommands(clientId, guildId); // Guild
 
-        // Clear existing commands
-        console.log('\nClearing existing commands...');
-        await rest.put(route, { body: [] });
-        console.log('Cleared all existing commands');
+        // Fetch existing commands for cleanup
+        const existingCommands = await rest.get(route);
+        if (existingCommands.length) {
+            console.log('\nDeleting existing commands...');
+            for (const cmd of existingCommands) {
+                console.log(` - Deleting /${cmd.name}`);
+                await rest.delete(`${route}/${cmd.id}`);
+            }
+        }
 
         // Deploy new commands
         console.log(`\nDeploying ${commands.length} commands...`);
