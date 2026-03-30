@@ -66,8 +66,9 @@ function resetBalance(userId) {
 
 function transferBalance(userIdFrom, userIdTo, amount) {
   if (amount <= 0) throw new Error("Amount must be greater than 0");
-  if (userIdFrom === userIdTo)
+  if (userIdFrom === userIdTo) {
     throw new Error("Cannot transfer to the same user");
+  }
 
   const fromRow = db
     .prepare("SELECT balance FROM users WHERE id = ?")

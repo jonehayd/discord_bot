@@ -102,8 +102,8 @@ function buildDeck() {
   const ranks = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"];
 
   const deck = [];
-  for (let suit of suits) {
-    for (let rank of ranks) {
+  for (const suit of suits) {
+    for (const rank of ranks) {
       deck.push({ value: rank, suit });
     }
   }
@@ -125,7 +125,7 @@ function getCardSum(hand) {
   let sum = 0;
   let aces = 0;
 
-  for (let card of hand) {
+  for (const card of hand) {
     if (card.value === "A") {
       sum += 1;
       aces++;

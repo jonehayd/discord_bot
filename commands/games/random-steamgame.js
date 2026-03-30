@@ -1,5 +1,4 @@
 import { MessageFlags, SlashCommandSubcommandBuilder } from "discord.js";
-import { addBalance } from "../../database/currency.js";
 import axios from "axios";
 
 const STEAM_API_KEY = process.env.STEAM_API_KEY;

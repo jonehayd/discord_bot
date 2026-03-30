@@ -1,4 +1,4 @@
-import { Events, MessageFlags } from "discord.js";
+import { Events } from "discord.js";
 import blackjackManager from "../commands/games/blackjack.js";
 import { addBalance, removeBalance } from "../database/currency.js";
 
@@ -8,8 +8,9 @@ export default {
     if (
       !interaction.isButton() ||
       !interaction.customId.startsWith("blackjack_")
-    )
+    ) {
       return;
+    }
 
     await interaction.deferUpdate(); // acknowledge the button
 
@@ -25,13 +26,14 @@ export default {
     }
 
     const game = blackjackManager.getGame(gameId);
-    if (!game)
+    if (!game) {
       return interaction.followUp({
         content: "This blackjack game is no longer active!",
         ephemeral: true,
       });
+    }
 
-    let { playerHand, botHand, deck, betAmount } = game;
+    const { playerHand, botHand, deck, betAmount } = game;
 
     if (type === "hit") {
       playerHand.push(blackjackManager.drawCard(deck));
