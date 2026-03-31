@@ -140,3 +140,11 @@ vite.config.ts.timestamp-*
 
 # Database
 *.db
+
+# Assets
+*.svg
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.ico
