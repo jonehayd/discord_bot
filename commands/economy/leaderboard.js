@@ -8,15 +8,28 @@ export default {
     .setDescription("Displays the top 5 user's with the most 🥥"),
   async execute(interaction) {
     const users = getLeaderboard();
-    const members = await Promise.all(
-      users.map((user) => interaction.guild.members.fetch(user.id)),
+
+    const results = await Promise.all(
+      users.map(async (user) => {
+        try {
+          const member = await interaction.guild.members.fetch(user.id);
+          return { username: member.user.username, balance: user.balance };
+        } catch {
+          return null; // User left the server
+        }
+      }),
     );
 
-    let output = "Leaderboard:\n";
-    members.forEach((member, i) => {
-      output += `${i + 1}. ${member.user.username} - $${users[i].balance}\n`;
-    });
+    const visible = results.filter(Boolean);
 
-    await interaction.reply(output);
+    if (visible.length === 0) {
+      return interaction.reply("No leaderboard data to display.");
+    }
+
+    const output = visible
+      .map((entry, i) => `${i + 1}. ${entry.username} - $${entry.balance}`)
+      .join("\n");
+
+    await interaction.reply(`Leaderboard:\n${output}`);
   },
 };
