@@ -1,50 +1,72 @@
-import { MessageFlags, SlashCommandSubcommandBuilder } from "discord.js";
+import {
+  MessageFlags,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  ActionRowBuilder,
+  SlashCommandSubcommandBuilder,
+} from "discord.js";
 import axios from "axios";
+import { getSteamId } from "../../database/steam.js";
 
 const STEAM_API_KEY = process.env.STEAM_API_KEY;
+
+export async function getLibrary(steamId64) {
+  const url = `https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${STEAM_API_KEY}&steamid=${steamId64}&include_appinfo=true&include_played_free_games=true`;
+  const res = await axios.get(url);
+  return res.data.response.games || [];
+}
+
+export function pickRandomGame(library) {
+  const names = library.map((g) => g.name);
+  return names[Math.floor(Math.random() * names.length)];
+}
 
 export default {
   name: "random-steamgame",
   data: new SlashCommandSubcommandBuilder()
     .setName("random-steamgame")
-    .setDescription(
-      `Gives a random game from a user's steam library. Your steam library must be set to public.`,
-    )
-    .addStringOption((option) =>
-      option
-        .setName("steam_id")
-        .setDescription("Steam id (found under username in Account Details).")
-        .setRequired(true),
-    ),
+    .setDescription("Gives a random game from your Steam library."),
   cooldown: 10,
   async execute(interaction) {
-    const steamId64 = interaction.options.getString("steam_id").trim();
+    const steamId = getSteamId(interaction.user.id);
 
-    try {
-      const library = await getLibrary(steamId64);
-
-      if (library.length === 0) {
-        return await interaction.reply(
-          "No games found or the library is private.",
+    if (steamId) {
+      // ID already on file — run the command directly
+      await interaction.deferReply();
+      try {
+        const library = await getLibrary(steamId);
+        if (library.length === 0) {
+          return interaction.editReply(
+            "No games found or your library is private.",
+          );
+        }
+        return interaction.editReply(
+          `Your random game is:\n**${pickRandomGame(library)}** 🎉`,
         );
+      } catch {
+        return interaction.editReply({
+          content:
+            "❌ Could not fetch your Steam library. Make sure your profile is set to public.",
+          flags: MessageFlags.Ephemeral,
+        });
       }
-      const gameNames = library.map((game) => game.name);
-      const randomGame =
-        gameNames[Math.floor(Math.random() * gameNames.length)];
-      interaction.reply(`Your random game is: \n${randomGame} :tada: !`);
-    } catch (error) {
-      console.error(error);
-      return await interaction.reply({
-        content: `Could not fetch steam library. Make sure the ID is correct and your library is public.`,
-        flags: MessageFlags.Ephemeral,
-      });
     }
+
+    // No ID on file — ask via modal
+    const modal = new ModalBuilder()
+      .setCustomId("steam_id_modal")
+      .setTitle("Link your Steam account");
+
+    const input = new TextInputBuilder()
+      .setCustomId("steam_id_input")
+      .setLabel("Your Steam ID64")
+      .setStyle(TextInputStyle.Short)
+      .setPlaceholder("e.g. 76561198012345678")
+      .setRequired(true);
+
+    modal.addComponents(new ActionRowBuilder().addComponents(input));
+
+    return interaction.showModal(modal);
   },
 };
-
-async function getLibrary(steamId64) {
-  const url = `https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=${STEAM_API_KEY}&steamid=${steamId64}&include_appinfo=true&include_played_free_games=true`;
-
-  const res = await axios.get(url);
-  return res.data.response.games || [];
-}
