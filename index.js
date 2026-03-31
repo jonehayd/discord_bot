@@ -3,8 +3,17 @@ import { fileURLToPath, pathToFileURL } from "url";
 import { dirname, join } from "path";
 import { readdirSync, statSync, existsSync } from "fs";
 import { Client, Collection, GatewayIntentBits } from "discord.js";
+import { deployCommands } from "./deploy-commands.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+console.log("Deploying commands...");
+try {
+  await deployCommands();
+} catch (error) {
+  console.error("Failed to deploy commands:", error);
+  process.exit(1);
+}
 
 const client = new Client({
   intents: [
@@ -12,6 +21,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.GuildVoiceStates,
   ],
 });
 

@@ -1,0 +1,21 @@
+import { SlashCommandSubcommandBuilder } from "discord.js";
+import {
+  buildControlPanel,
+  setControlPanelMessage,
+} from "../../core/music-controller.js";
+
+export default {
+  name: "ctrl",
+  data: new SlashCommandSubcommandBuilder()
+    .setName("ctrl")
+    .setDescription("Open the music control panel"),
+
+  async execute(interaction) {
+    const panel = buildControlPanel(interaction.guildId);
+    const { resource } = await interaction.reply({
+      ...panel,
+      withResponse: true,
+    });
+    setControlPanelMessage(interaction.guildId, resource.message);
+  },
+};
