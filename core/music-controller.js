@@ -12,6 +12,17 @@ import {
   isAutoplaying,
 } from "./music-player.js";
 
+/** Stores the control panel Message per guild so it can be refreshed after modal submits. */
+const controlPanelMessages = new Map();
+
+function setControlPanelMessage(guildId, message) {
+  controlPanelMessages.set(guildId, message);
+}
+
+function getControlPanelMessage(guildId) {
+  return controlPanelMessages.get(guildId);
+}
+
 /**
  * Builds the music control panel embed and button rows for a guild.
  * @param {string} guildId
@@ -70,6 +81,11 @@ function buildControlPanel(guildId) {
 
   const row1 = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
+      .setCustomId("music_play")
+      .setLabel("Play")
+      .setEmoji("🔍")
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
       .setCustomId("music_pauseresume")
       .setLabel(paused ? "Resume" : "Pause")
       .setEmoji(paused ? "▶️" : "⏸️")
@@ -111,4 +127,4 @@ function buildControlPanel(guildId) {
   return { embeds: [embed], components: [row1, row2] };
 }
 
-export { buildControlPanel };
+export { buildControlPanel, setControlPanelMessage, getControlPanelMessage };

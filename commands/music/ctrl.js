@@ -1,5 +1,8 @@
 import { SlashCommandSubcommandBuilder } from "discord.js";
-import { buildControlPanel } from "../../core/music-controller.js";
+import {
+  buildControlPanel,
+  setControlPanelMessage,
+} from "../../core/music-controller.js";
 
 export default {
   name: "ctrl",
@@ -9,6 +12,7 @@ export default {
 
   async execute(interaction) {
     const panel = buildControlPanel(interaction.guildId);
-    return interaction.reply(panel);
+    const message = await interaction.reply({ ...panel, fetchReply: true });
+    setControlPanelMessage(interaction.guildId, message);
   },
 };
