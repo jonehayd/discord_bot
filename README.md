@@ -104,6 +104,6 @@ assets/         # Static assets
 docs/           # Documentation page
 ```
 
-Commands can be easily added by adding a new command foler with `index.js` as the parent command, and adding all subcommands in the same folder.
+Commands can be easily added by adding a new command folder with `index.js` as the parent command, and adding all subcommands in the same folder.
 
 ---
