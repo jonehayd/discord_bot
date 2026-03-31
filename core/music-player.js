@@ -18,6 +18,9 @@ const players = new Map();
 /** Guilds that have autoplay enabled — persists across disconnect/reconnect */
 const autoplayEnabled = new Set();
 
+/** Guilds that have loop enabled — persists across disconnect/reconnect */
+const loopEnabled = new Set();
+
 function createGuildPlayer(guildId) {
   const audioPlayer = createAudioPlayer();
 
@@ -25,7 +28,7 @@ function createGuildPlayer(guildId) {
     const state = players.get(guildId);
     if (!state) return;
 
-    if (state.queue.length > 0) {
+    if (state.queue.length > 0 || loopEnabled.has(guildId)) {
       playNext(guildId);
     } else if (autoplayEnabled.has(guildId)) {
       handleAutoplay(guildId);
@@ -59,7 +62,6 @@ function createGuildPlayer(guildId) {
     connection: null,
     textChannel: null,
     disconnectTimer: null,
-    loop: false,
     lastPlayedUrl: null,
     autoplayPrefetch: null,
     currentProcess: null,
@@ -68,19 +70,21 @@ function createGuildPlayer(guildId) {
 
 async function playNext(guildId) {
   const state = players.get(guildId);
-  if (!state || state.queue.length === 0) return;
+  if (!state) return;
 
-  // If looping, re-add the current song to the back of the queue before shifting
-  if (state.loop && state.currentSong) {
+  // If looping, re-add the current song before checking if the queue is empty
+  if (loopEnabled.has(guildId) && state.currentSong) {
     state.queue.push(state.currentSong);
   }
+
+  if (state.queue.length === 0) return;
 
   const song = state.queue.shift();
   state.currentSong = song;
   state.lastPlayedUrl = song.url;
 
   // Pre-fetch the next related video in the background while this song plays
-  if (autoplayEnabled.has(guildId) && !state.loop) {
+  if (autoplayEnabled.has(guildId) && !loopEnabled.has(guildId)) {
     state.autoplayPrefetch = fetchRelated(song.url);
   }
 
@@ -249,14 +253,16 @@ function removeFromQueue(guildId, index) {
 }
 
 function setLoop(guildId, enabled) {
-  const state = players.get(guildId);
-  if (!state) return false;
-  state.loop = enabled;
+  if (enabled) {
+    loopEnabled.add(guildId);
+  } else {
+    loopEnabled.delete(guildId);
+  }
   return true;
 }
 
 function isLooping(guildId) {
-  return players.get(guildId)?.loop ?? false;
+  return loopEnabled.has(guildId);
 }
 
 function isPaused(guildId) {

@@ -16,19 +16,14 @@ export default {
       });
     }
 
-    const current = getCurrentSong(interaction.guildId);
-    if (!current) {
-      return interaction.reply({
-        content: "❌ Nothing is currently playing.",
-        flags: MessageFlags.Ephemeral,
-      });
-    }
-
     const nowLooping = !isLooping(interaction.guildId);
     setLoop(interaction.guildId, nowLooping);
 
+    const current = getCurrentSong(interaction.guildId);
+    const songLabel = current ? ` **${current.title}**` : "";
+
     return interaction.reply(
-      nowLooping ? `🔁 Now looping **${current.title}**.` : `➡️ Loop disabled.`,
+      nowLooping ? `🔁 Loop enabled${songLabel}.` : `➡️ Loop disabled.`,
     );
   },
 };
