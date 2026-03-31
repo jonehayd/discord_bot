@@ -8,11 +8,15 @@ import {
   joinVoiceChannel,
 } from "@discordjs/voice";
 import youtubedl from "youtube-dl-exec";
+import playdl from "play-dl";
 
 const IDLE_DISCONNECT_MS = 30_000;
 
 /** @type {Map<string, GuildPlayerState>} */
 const players = new Map();
+
+/** Guilds that have autoplay enabled — persists across disconnect/reconnect */
+const autoplayEnabled = new Set();
 
 function createGuildPlayer(guildId) {
   const audioPlayer = createAudioPlayer();
@@ -23,6 +27,8 @@ function createGuildPlayer(guildId) {
 
     if (state.queue.length > 0) {
       playNext(guildId);
+    } else if (autoplayEnabled.has(guildId)) {
+      handleAutoplay(guildId);
     } else {
       state.currentSong = null;
       state.disconnectTimer = setTimeout(() => {
@@ -54,6 +60,9 @@ function createGuildPlayer(guildId) {
     textChannel: null,
     disconnectTimer: null,
     loop: false,
+    lastPlayedUrl: null,
+    autoplayPrefetch: null,
+    currentProcess: null,
   };
 }
 
@@ -68,6 +77,12 @@ async function playNext(guildId) {
 
   const song = state.queue.shift();
   state.currentSong = song;
+  state.lastPlayedUrl = song.url;
+
+  // Pre-fetch the next related video in the background while this song plays
+  if (autoplayEnabled.has(guildId) && !state.loop) {
+    state.autoplayPrefetch = fetchRelated(song.url);
+  }
 
   try {
     const ytProcess = youtubedl.exec(song.url, {
@@ -78,6 +93,12 @@ async function playNext(guildId) {
       quiet: true,
       preferFreeFormats: true,
     });
+    // Suppress the broken-pipe rejection that occurs when the stream is
+    // intentionally cut off by a skip or stop — not a real error.
+    ytProcess.catch?.(() => {
+      /* broken pipe on skip/stop — expected */
+    });
+    state.currentProcess = ytProcess;
     const resource = createAudioResource(ytProcess.stdout, {
       inputType: StreamType.Arbitrary,
     });
@@ -162,6 +183,8 @@ function skip(guildId) {
   const hasAnything = state.currentSong || state.queue.length > 0;
   if (!hasAnything) return false;
 
+  state.currentProcess?.kill?.();
+  state.currentProcess = null;
   state.audioPlayer.stop(); // triggers Idle event → playNext
   return true;
 }
@@ -172,6 +195,8 @@ function stop(guildId) {
 
   if (state.disconnectTimer) clearTimeout(state.disconnectTimer);
 
+  state.currentProcess?.kill?.();
+  state.currentProcess = null;
   state.queue = [];
   state.currentSong = null;
   state.audioPlayer.stop();
@@ -240,6 +265,107 @@ function isPaused(guildId) {
   );
 }
 
+async function fetchRelated(url) {
+  try {
+    const info = await youtubedl(url, {
+      dumpSingleJson: true,
+      quiet: true,
+      noWarnings: true,
+    });
+
+    // Try yt-dlp's related_videos list first (often empty on modern YouTube)
+    const related = info.related_videos ?? [];
+    const nextRelated = related.find(
+      (v) => v.id && v.duration && !v.live_status,
+    );
+    if (nextRelated) {
+      const minutes = Math.floor(nextRelated.duration / 60);
+      const seconds = String(nextRelated.duration % 60).padStart(2, "0");
+      return {
+        title: nextRelated.title ?? "Unknown Title",
+        url: `https://www.youtube.com/watch?v=${nextRelated.id}`,
+        duration: `${minutes}:${seconds}`,
+        thumbnail: nextRelated.thumbnails?.[0]?.url ?? null,
+      };
+    }
+
+    // Fallback: search by the video's uploader/channel name
+    const searchQuery = info.uploader ?? info.channel ?? info.title;
+    if (!searchQuery) return null;
+
+    const results = await playdl.search(searchQuery, {
+      limit: 5,
+      source: { youtube: "video" },
+    });
+
+    // Pick the first result that isn't the song we just played
+    const next = results.find((v) => v.url !== url);
+    if (!next) return null;
+
+    return {
+      title: next.title ?? "Unknown Title",
+      url: next.url,
+      duration: next.durationRaw ?? "?:??",
+      thumbnail: next.thumbnails?.[0]?.url ?? null,
+    };
+  } catch (error) {
+    console.error(
+      "[MusicPlayer] Failed to fetch related video:",
+      error.message,
+    );
+    return null;
+  }
+}
+
+async function handleAutoplay(guildId) {
+  const state = players.get(guildId);
+  if (!state) return;
+
+  state.currentSong = null;
+
+  // Use the pre-fetched result if ready, otherwise fetch now (cold path)
+  let nextSong = null;
+  if (state.autoplayPrefetch) {
+    nextSong = await state.autoplayPrefetch;
+    state.autoplayPrefetch = null;
+  }
+
+  if (!nextSong && state.lastPlayedUrl) {
+    nextSong = await fetchRelated(state.lastPlayedUrl);
+  }
+
+  // If we still couldn't get a recommendation, fall back to disconnect
+  if (!nextSong) {
+    state.disconnectTimer = setTimeout(() => {
+      const s = players.get(guildId);
+      if (s && !s.currentSong && s.queue.length === 0) {
+        s.connection?.destroy();
+        players.delete(guildId);
+      }
+    }, IDLE_DISCONNECT_MS);
+    return;
+  }
+
+  nextSong.requestedBy = "Autoplay";
+  state.queue.push(nextSong);
+  playNext(guildId);
+}
+
+function setAutoplay(guildId, enabled) {
+  if (enabled) {
+    autoplayEnabled.add(guildId);
+  } else {
+    autoplayEnabled.delete(guildId);
+    const state = players.get(guildId);
+    if (state) state.autoplayPrefetch = null;
+  }
+  return true;
+}
+
+function isAutoplaying(guildId) {
+  return autoplayEnabled.has(guildId);
+}
+
 export {
   addToQueue,
   skip,
@@ -253,4 +379,6 @@ export {
   setLoop,
   isLooping,
   isPaused,
+  setAutoplay,
+  isAutoplaying,
 };
