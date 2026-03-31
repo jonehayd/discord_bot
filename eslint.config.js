@@ -1,24 +1,30 @@
-const js = require('@eslint/js');
+import js from "@eslint/js";
 
-module.exports = [
-	js.configs.recommended,
-	{
-		env: {
-			node: true,
-			es2025: true,
-		},
-		languageOptions: {
-			ecmaVersion: 'latest',
-		},
-		rules: {
-			curly: ['error', 'multi-line', 'consistent'],
-			'no-empty-function': 'error',
-			'no-shadow': ['error', { allow: ['err', 'resolve', 'reject'] }],
-			'no-var': 'error',
-			'prefer-const': 'error',
-			'no-multiple-empty-lines': ['error', { max: 2, maxEOF: 1, maxBOF: 0 }],
-			'no-trailing-spaces': 'error',
-			'semi': ['error', 'always'],
-		},
-	},
+export default [
+  js.configs.recommended,
+  {
+    languageOptions: {
+      ecmaVersion: "latest",
+      globals: {
+        process: "readonly",
+        console: "readonly",
+        setTimeout: "readonly",
+        setInterval: "readonly",
+        clearTimeout: "readonly",
+        clearInterval: "readonly",
+        setImmediate: "readonly",
+        clearImmediate: "readonly",
+      },
+    },
+    rules: {
+      curly: ["error", "multi-line", "consistent"],
+      "no-empty-function": "error",
+      "no-shadow": ["error", { allow: ["err", "resolve", "reject"] }],
+      "no-var": "error",
+      "prefer-const": "error",
+      "no-multiple-empty-lines": ["error", { max: 2, maxEOF: 1, maxBOF: 0 }],
+      "no-trailing-spaces": "error",
+      semi: ["error", "always"],
+    },
+  },
 ];

@@ -1,14 +1,16 @@
-// currency.js
-const Database = require("better-sqlite3");
+import Database from "better-sqlite3";
+
 const db = new Database("currency.db");
 
-// Create the table if it doesn’t exist
-db.prepare(`
+// Create the table if it doesn't exist
+db.prepare(
+  `
   CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     balance INTEGER DEFAULT 0
   )
-`).run();
+`,
+).run();
 
 function getBalance(userId) {
   const row = db.prepare("SELECT balance FROM users WHERE id = ?").get(userId);
@@ -16,19 +18,25 @@ function getBalance(userId) {
 }
 
 function addBalance(userId, amount) {
-  if(!userId || !amount) {
-    throw new Error('[Error] userId and amount cannot be null in addBalance');
+  if (!userId || !amount) {
+    throw new Error("[Error] userId and amount cannot be null in addBalance");
   }
-  
+
   const row = db.prepare("SELECT balance FROM users WHERE id = ?").get(userId);
   const currentBalance = row ? row.balance : 0;
 
   const newBalance = Math.max(currentBalance + amount, 0);
 
   if (!row) {
-    db.prepare("INSERT INTO users (id, balance) VALUES (?, ?)").run(userId, amount);
+    db.prepare("INSERT INTO users (id, balance) VALUES (?, ?)").run(
+      userId,
+      amount,
+    );
   } else {
-    db.prepare("UPDATE users SET balance = ? WHERE id = ?").run(newBalance, userId);
+    db.prepare("UPDATE users SET balance = ? WHERE id = ?").run(
+      newBalance,
+      userId,
+    );
   }
 
   return newBalance;
@@ -39,13 +47,15 @@ function removeBalance(userId, amount) {
 }
 
 function getLeaderboard(limit = 5) {
-  return db.prepare("SELECT id, balance FROM users ORDER BY balance DESC LIMIT ?").all(limit);
+  return db
+    .prepare("SELECT id, balance FROM users ORDER BY balance DESC LIMIT ?")
+    .all(limit);
 }
 
 function resetBalance(userId) {
   const row = db.prepare("SELECT balance FROM users WHERE id = ?").get(userId);
 
-  if(!row) {
+  if (!row) {
     db.prepare("INSERT INTO users (id, balance) VALUES (?, 0)").run(userId);
     return 0;
   } else {
@@ -55,14 +65,17 @@ function resetBalance(userId) {
 }
 
 function transferBalance(userIdFrom, userIdTo, amount) {
-  if(amount <= 0) throw new Error("Amount must be greater than 0");
-  if(userIdFrom === userIdTo) throw new Error("Cannot transfer to the same user");
+  if (amount <= 0) throw new Error("Amount must be greater than 0");
+  if (userIdFrom === userIdTo) {
+    throw new Error("Cannot transfer to the same user");
+  }
 
-  // Get balances
-  const fromRow = db.prepare("SELECT balance FROM users WHERE id = ?").get(userIdFrom);
+  const fromRow = db
+    .prepare("SELECT balance FROM users WHERE id = ?")
+    .get(userIdFrom);
   const fromBalance = fromRow ? fromRow.balance : 0;
 
-  if(fromBalance < amount) {
+  if (fromBalance < amount) {
     throw new Error("Insufficient balance for transfer");
   }
 
@@ -75,15 +88,15 @@ function transferBalance(userIdFrom, userIdTo, amount) {
 
   return {
     from: getBalance(userIdFrom),
-    to: getBalance(userIdTo)
-  }
+    to: getBalance(userIdTo),
+  };
 }
 
-module.exports = { 
-  getBalance, 
-  addBalance, 
-  removeBalance, 
-  getLeaderboard, 
-  resetBalance, 
-  transferBalance 
+export {
+  getBalance,
+  addBalance,
+  removeBalance,
+  getLeaderboard,
+  resetBalance,
+  transferBalance,
 };
