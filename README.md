@@ -40,7 +40,7 @@ YouTube playback via `play-dl` with a persistent per-guild queue. Supports play,
 ## Documentation
 
 Full command reference with descriptions and option details:
-**[View Commands]([https://your-docs-site.com/commands.html](https://jonehayd.github.io/discord_bot/))**
+**[View Commands](https://jonehayd.github.io/discord_bot/)**
 
 ---
 
