@@ -12,7 +12,10 @@ export default {
 
   async execute(interaction) {
     const panel = buildControlPanel(interaction.guildId);
-    const message = await interaction.reply({ ...panel, fetchReply: true });
-    setControlPanelMessage(interaction.guildId, message);
+    const { resource } = await interaction.reply({
+      ...panel,
+      withResponse: true,
+    });
+    setControlPanelMessage(interaction.guildId, resource.message);
   },
 };

@@ -48,7 +48,7 @@ export default {
 
     // --- Modal submit: resolve and queue the song ---
     if (isMusicModal) {
-      await interaction.deferReply({ ephemeral: true });
+      await interaction.deferReply({ flags: MessageFlags.Ephemeral });
       const query = interaction.fields.getTextInputValue("music_play_query");
 
       try {
