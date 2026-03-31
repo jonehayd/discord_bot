@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bot Command Reference</title>
+    <link rel="icon" type="image/x-icon" href="coco.svg" />
     <style>
       /* ── Reset & Variables ── */
       *,
@@ -47,6 +48,24 @@
         color: var(--text-primary);
         display: flex;
         min-height: 100vh;
+      }
+
+      /* ── Background image ── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: url("hawaiian-beaches.jpg") center / cover no-repeat;
+        opacity: 0.08;
+        mix-blend-mode: luminosity;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .sidebar,
+      .main {
+        position: relative;
+        z-index: 1;
       }
 
       /* ── Scrollbar ── */
@@ -1028,17 +1047,17 @@
               </div>
               <div class="option-row">
                 <span class="option-name">hours</span>
-                <span class="option-desc">Hours to wait (0–168)</span>
+                <span class="option-desc">Hours to wait (0-168)</span>
                 <span class="option-badge opt">optional</span>
               </div>
               <div class="option-row">
                 <span class="option-name">minutes</span>
-                <span class="option-desc">Minutes to wait (0–59)</span>
+                <span class="option-desc">Minutes to wait (0-59)</span>
                 <span class="option-badge opt">optional</span>
               </div>
               <div class="option-row">
                 <span class="option-name">seconds</span>
-                <span class="option-desc">Seconds to wait (0–59)</span>
+                <span class="option-desc">Seconds to wait (0-59)</span>
                 <span class="option-badge opt">optional</span>
               </div>
               <div class="option-row">
