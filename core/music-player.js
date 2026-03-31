@@ -53,12 +53,18 @@ function createGuildPlayer(guildId) {
     connection: null,
     textChannel: null,
     disconnectTimer: null,
+    loop: false,
   };
 }
 
 async function playNext(guildId) {
   const state = players.get(guildId);
   if (!state || state.queue.length === 0) return;
+
+  // If looping, re-add the current song to the back of the queue before shifting
+  if (state.loop && state.currentSong) {
+    state.queue.push(state.currentSong);
+  }
 
   const song = state.queue.shift();
   state.currentSong = song;
@@ -182,4 +188,69 @@ function getCurrentSong(guildId) {
   return players.get(guildId)?.currentSong ?? null;
 }
 
-export { addToQueue, skip, stop, getQueue, getCurrentSong };
+function pause(guildId) {
+  const state = players.get(guildId);
+  if (!state || state.audioPlayer.state.status !== AudioPlayerStatus.Playing) {
+    return false;
+  }
+  state.audioPlayer.pause();
+  return true;
+}
+
+function resume(guildId) {
+  const state = players.get(guildId);
+  if (!state || state.audioPlayer.state.status !== AudioPlayerStatus.Paused) {
+    return false;
+  }
+  state.audioPlayer.unpause();
+  return true;
+}
+
+function shuffle(guildId) {
+  const state = players.get(guildId);
+  if (!state || state.queue.length < 2) return false;
+  for (let i = state.queue.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [state.queue[i], state.queue[j]] = [state.queue[j], state.queue[i]];
+  }
+  return true;
+}
+
+function removeFromQueue(guildId, index) {
+  const state = players.get(guildId);
+  if (!state || index < 1 || index > state.queue.length) return null;
+  const [removed] = state.queue.splice(index - 1, 1);
+  return removed;
+}
+
+function setLoop(guildId, enabled) {
+  const state = players.get(guildId);
+  if (!state) return false;
+  state.loop = enabled;
+  return true;
+}
+
+function isLooping(guildId) {
+  return players.get(guildId)?.loop ?? false;
+}
+
+function isPaused(guildId) {
+  return (
+    players.get(guildId)?.audioPlayer.state.status === AudioPlayerStatus.Paused
+  );
+}
+
+export {
+  addToQueue,
+  skip,
+  stop,
+  getQueue,
+  getCurrentSong,
+  pause,
+  resume,
+  shuffle,
+  removeFromQueue,
+  setLoop,
+  isLooping,
+  isPaused,
+};
