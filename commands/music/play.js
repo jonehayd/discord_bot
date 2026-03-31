@@ -46,7 +46,11 @@ export default {
     try {
       let videoInfo;
 
-      if (playdl.yt_validate(query) === "video") {
+      const isUrl =
+        playdl.yt_validate(query) === "video" ||
+        /^https?:\/\/(www\.)?(youtu\.be\/|youtube\.com\/)/.test(query);
+
+      if (isUrl) {
         const info = await playdl.video_basic_info(query);
         videoInfo = info.video_details;
       } else {
@@ -62,7 +66,10 @@ export default {
 
       const song = {
         title: videoInfo.title ?? "Unknown Title",
-        url: videoInfo.url,
+        // When a URL is provided directly, always use the original query so
+        // yt-dlp receives the exact URL the user typed (handles short links,
+        // tracking params, etc.) instead of play-dl's re-serialized version.
+        url: isUrl ? query : videoInfo.url,
         duration: videoInfo.durationRaw ?? "?:??",
         thumbnail: videoInfo.thumbnails?.[0]?.url ?? null,
         requestedBy: interaction.user.username,
