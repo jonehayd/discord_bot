@@ -4,6 +4,8 @@ import {
   MessageFlags,
 } from "discord.js";
 import OpenAI from "openai";
+import { getSteamId } from "../../database/steam.js";
+import { getLibrary } from "../games/random-steamgame.js";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -79,6 +81,32 @@ export default {
       // Missing permissions or DM channel — proceed without messages
     }
 
+    // Gather Steam library context
+    let steamSection = "";
+    try {
+      const steamId = getSteamId(target.id);
+      if (steamId) {
+        const library = await getLibrary(steamId);
+        if (library.length > 0) {
+          const sorted = [...library].sort(
+            (a, b) => b.playtime_forever - a.playtime_forever,
+          );
+          const topPlayed = sorted
+            .slice(0, 5)
+            .map(
+              (g, i) =>
+                `${i + 1}. ${g.name} (${(g.playtime_forever / 60).toFixed(1)} hours)`,
+            )
+            .join("\n");
+          steamSection =
+            `\nSteam library (${library.length} games total):` +
+            `\nTop played games:\n${topPlayed}`;
+        }
+      }
+    } catch {
+      // Steam fetch failed — proceed without it
+    }
+
     // Build prompt
     const profileLines = [
       `Username: ${target.username}`,
@@ -98,7 +126,7 @@ export default {
         ? `\nHere are some of their recent messages in this channel:\n${recentMessages.map((m, i) => `${i + 1}. "${m}"`).join("\n")}`
         : "\nNo recent messages found for this user in this channel.";
 
-    const prompt = `${profileLines}${messagesSection}`;
+    const prompt = `${profileLines}${messagesSection}${steamSection}`;
 
     const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
