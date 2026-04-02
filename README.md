@@ -15,6 +15,10 @@ A coconut-based currency system persisted with SQLite. Users can check balances,
 - **Rob** — attempt to steal coconuts from another user; they get a timed window to accept or deny
 - **Poll** — spin up a yes/no reaction poll with a configurable duration
 - **Trivia** — answer questions pulled from the Open Trivia DB across 10 categories and 3 difficulty tiers, with coconut rewards on a correct answer
+- **Roast** — AI roasts a target user using their profile, recent messages, and Steam library (if linked)
+- **Compliment** — AI showers a user with personalised compliments using the same context as roast
+- **Would You Rather** — AI generates a dilemma for the server to vote on; supports an optional theme and tracks live votes for 5 minutes
+- **Chat** — send any message to the AI and get a response directly in the channel
 
 ### 🎮 Games
 
@@ -70,12 +74,13 @@ GUILD_ID=your_server_id
 STEAM_API_KEY=your_steam_api_key
 ```
 
-| Variable        | Description                                         |
-| --------------- | --------------------------------------------------- |
-| `DISCORD_TOKEN` | Your bot's token from the Developer Portal          |
-| `CLIENT_ID`     | The application ID (also from the Developer Portal) |
-| `GUILD_ID`      | The ID of the server to deploy slash commands to    |
-| `STEAM_API_KEY` | Required for `/games random-steamgame`              |
+| Variable         | Description                                                       |
+| ---------------- | ----------------------------------------------------------------- |
+| `DISCORD_TOKEN`  | Your bot's token from the Developer Portal                        |
+| `CLIENT_ID`      | The application ID (also from the Developer Portal)               |
+| `GUILD_ID`       | The ID of the server to deploy slash commands to                  |
+| `STEAM_API_KEY`  | Required for `/games random-steamgame`                            |
+| `OPENAI_API_KEY` | Required for `/fun roast`, `compliment`, `wouldyourather`, `chat` |
 
 ### Running the Bot
 
