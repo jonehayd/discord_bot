@@ -30,7 +30,8 @@ export default {
 
     if (target.bot) {
       return interaction.reply({
-        content: "❌ Bots don't need compliments — they already think they're perfect.",
+        content:
+          "❌ Bots don't need compliments — they already think they're perfect.",
         flags: MessageFlags.Ephemeral,
       });
     }
