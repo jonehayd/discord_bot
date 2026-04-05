@@ -1,5 +1,7 @@
 # 🥥 Coconut Bot
 
+![Bot demo](assets/Bot-demo.gif)
+
 A Discord bot built with [discord.js v14](https://discord.js.org/) and hosted on Oracle Cloud. I made this as a personal project for my friend group's server. It includes a good amount of commands — covering everything from a full economy system to music playback and mini games. Others can easily run this bot on their personal server by following the **Getting started** section.
 
 ---
